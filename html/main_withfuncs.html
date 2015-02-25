@@ -1,0 +1,942 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>main</title><meta name="generator" content="MATLAB 8.4"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2015-02-03"><meta name="DC.source" content="main.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">CoEmbedding algorithm running script</a></li><li><a href="#2">LEDF Model Optimization</a></li></ul><h2>Called Functions</h2><ul><li><a href="#CoEmbedding">CoEmbedding </a></li><li><a href="#CalRelationXY">CalRelationXY </a></li><li><a href="#Plotcluster">Plotcluster </a></li></ul></div><h2>CoEmbedding algorithm running script<a name="1"></a></h2><pre class="codeinput">clear <span class="string">classes</span>
+clear
+close <span class="string">all</span>
+clc
+
+path=<span class="string">'/Users/yuwu/Documents/MATLAB/my_matlab/Relational_embedding/LED_release/datasets'</span>;
+addpath(path);
+
+<span class="comment">%match={ 'ring','round','co-dot','SD1','SD2','SD3','SD4','SSD1', 'SSD2','SSD3', 'SSD4',...</span>
+<span class="comment">%       'xor','2dnormals','Aggregation','Compound','circles', 'R15','rface','Pathbased',...</span>
+<span class="comment">%       'CoTarget','CoIris','LetterRecognize','Newletter','ecoli','Codigit','digit04'}</span>
+
+load(<span class="string">'SD3'</span>);
+R=CalRelationXY(X,Y,<span class="string">'gaussian'</span>,<span class="string">'mean'</span>);
+</pre><pre class="codeoutput">Warning: Objects of 'onCleanup' class exist.  Cannot clear this class or
+any of its superclasses. 
+</pre><h2>LEDF Model Optimization<a name="2"></a></h2><pre class="codeinput">opt  = {<span class="string">'optimisation'</span>, <span class="string">'ga'</span>, <span class="string">'obj_option'</span>, <span class="string">'quant_knn'</span>, <span class="string">'obj_para'</span>, {<span class="string">'knn'</span>, 10}};
+
+para_range = {<span class="string">'eta1'</span>,[-1.5,11],<span class="string">'eta2'</span>,[-1.5,11],<span class="string">'alpha'</span>,[0,2], <span class="string">'beta'</span>,[-0.4,2] };
+
+I    = {<span class="string">'R'</span>, R, <span class="string">'method'</span>, <span class="string">'LEDFsvd_beta'</span>, <span class="string">'dim'</span>,2, <span class="string">'model_optimisation'</span>, opt,<span class="string">'parameter_range'</span>,para_range };
+
+
+o    = CoEmbedding(I);
+o    = train(o);
+
+h=figure;
+Plotcluster(o.X',lx,o.Y',ly);
+
+<span class="comment">% %% CoEmbedding model evaluation</span>
+<span class="comment">%</span>
+<span class="comment">% option  = {'evaluation', '3D', 'obj_option', 'quant_knn', 'obj_para', {'knn', 20}};</span>
+<span class="comment">%</span>
+<span class="comment">% para_range = {'eta1', 7.7001 , 'eta2', 7.7001, 'alpha', [0.2 ,1.4], 'beta', 0.1700, 'interval', 0.01 };</span>
+<span class="comment">%</span>
+<span class="comment">% I    = {'R', R, 'method', 'LEDsvd', 'dim',2, 'model_optimisation', option,'parameter_range',para_range };</span>
+<span class="comment">%</span>
+<span class="comment">%</span>
+<span class="comment">% obj_fun_eval = CoEmbedding(I);</span>
+<span class="comment">% obj_fun_eval = Eval(obj_fun_eval);</span>
+</pre><pre class="codeoutput">It is current running LEDFsvd_beta.....diff_alpha
+
+                               Best           Mean      Stall
+Generation      f-count        f(x)           f(x)    Generations
+    1           208             641           780.9        0
+    2           312             606           753.5        0
+    3           416             552           730.4        0
+    4           520             552             721        1
+    5           624             482           706.5        0
+    6           728             482           706.4        1
+    7           832             482           693.1        2
+    8           936             469           656.9        0
+    9          1040             463           651.5        0
+   10          1144             460           650.6        0
+   11          1248             460           633.8        1
+   12          1352             460           607.7        2
+   13          1456             460           567.6        3
+   14          1560             448             549        0
+   15          1664             445           533.6        0
+   16          1768             445             530        1
+   17          1872             445           519.8        2
+   18          1976             445           494.8        3
+   19          2080             429           478.9        0
+   20          2184             417           473.5        0
+   21          2288             417           491.6        1
+   22          2392             417           482.6        2
+   23          2496             372           468.8        0
+   24          2600             372           463.5        1
+   25          2704             362           454.2        0
+   26          2808             348           442.3        0
+   27          2912             330           443.7        0
+   28          3016             330           466.2        1
+   29          3120             330           457.8        2
+   30          3224             330           432.5        3
+
+                               Best           Mean      Stall
+Generation      f-count        f(x)           f(x)    Generations
+   31          3328             328             403        0
+   32          3432             328           393.8        1
+   33          3536             327           382.8        0
+   34          3640             327           381.6        1
+   35          3744             315           368.6        0
+   36          3848             313           367.1        0
+   37          3952             313           393.1        1
+   38          4056             312           395.3        0
+   39          4160             312           402.2        1
+   40          4264             312           380.9        2
+   41          4368             312           351.5        3
+   42          4472             312           341.1        4
+   43          4576             312           328.8        5
+   44          4680             310           324.7        0
+   45          4784             309           321.9        0
+   46          4888             306           317.7        0
+   47          4992             306           324.4        1
+   48          5096             306           320.5        2
+   49          5200             306           316.3        3
+   50          5304             306           314.3        4
+   51          5408             305           310.6        0
+   52          5512             305             309        1
+   53          5616             305           308.5        2
+   54          5720             304           307.6        0
+   55          5824             304           306.4        1
+   56          5928             304           306.1        2
+   57          6032             304           305.6        3
+   58          6136             304           305.3        4
+   59          6240             304             305        5
+   60          6344             304           304.8        6
+
+                               Best           Mean      Stall
+Generation      f-count        f(x)           f(x)    Generations
+   61          6448             304           304.6        7
+   62          6552             304           304.6        8
+   63          6656             304           304.5        9
+   64          6760             304           304.4       10
+   65          6864             304           304.3       11
+   66          6968             304           304.3       12
+   67          7072             304           304.3       13
+   68          7176             304           304.2       14
+   69          7280             304           304.3       15
+   70          7384             304           304.2       16
+   71          7488             304           304.3       17
+   72          7592             304           304.3       18
+   73          7696             304           304.2       19
+   74          7800             304           304.3       20
+   75          7904             304           304.2       21
+   76          8008             304           304.2       22
+   77          8112             304           304.2       23
+   78          8216             304           304.2       24
+   79          8320             304           304.3       25
+   80          8424             304           304.2       26
+   81          8528             304           304.3       27
+   82          8632             304           304.3       28
+   83          8736             304           304.2       29
+   84          8840             304           304.3       30
+   85          8944             304           304.3       31
+   86          9048             304           304.3       32
+   87          9152             304           304.3       33
+   88          9256             304           304.3       34
+   89          9360             304           304.2       35
+   90          9464             304           304.3       36
+
+                               Best           Mean      Stall
+Generation      f-count        f(x)           f(x)    Generations
+   91          9568             304           304.2       37
+   92          9672             304           304.3       38
+   93          9776             304           304.3       39
+   94          9880             304           304.3       40
+   95          9984             304           304.3       41
+   96         10088             304           304.3       42
+   97         10192             304           304.3       43
+   98         10296             304           304.3       44
+   99         10400             304           304.3       45
+  100         10504             304           304.3       46
+  101         10608             304           304.2       47
+  102         10712             304           304.2       48
+  103         10816             304           304.3       49
+  104         10920             304           304.2       50
+Optimization terminated: average change in the fitness value less than options.TolFun.
+</pre><img vspace="5" hspace="5" src="main_01.png" alt=""> <img vspace="5" hspace="5" src="main_02.png" alt=""> <p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2014b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% CoEmbedding algorithm running script
+clear classes
+clear
+close all
+clc
+
+path='/Users/yuwu/Documents/MATLAB/my_matlab/Relational_embedding/LED_release/datasets';
+addpath(path);
+
+%match={ 'ring','round','co-dot','SD1','SD2','SD3','SD4','SSD1', 'SSD2','SSD3', 'SSD4',...
+%       'xor','2dnormals','Aggregation','Compound','circles', 'R15','rface','Pathbased',...
+%       'CoTarget','CoIris','LetterRecognize','Newletter','ecoli','Codigit','digit04'}
+
+load('SD3');
+R=CalRelationXY(X,Y,'gaussian','mean');
+
+%% LEDF Model Optimization
+
+opt  = {'optimisation', 'ga', 'obj_option', 'quant_knn', 'obj_para', {'knn', 10}};
+
+para_range = {'eta1',[-1.5,11],'eta2',[-1.5,11],'alpha',[0,2], 'beta',[-0.4,2] };
+
+I    = {'R', R, 'method', 'LEDFsvd_beta', 'dim',2, 'model_optimisation', opt,'parameter_range',para_range };
+
+
+o    = CoEmbedding(I);
+o    = train(o);
+
+h=figure;
+Plotcluster(o.X',lx,o.Y',ly);
+
+% %% CoEmbedding model evaluation
+% 
+% option  = {'evaluation', '3D', 'obj_option', 'quant_knn', 'obj_para', {'knn', 20}};
+% 
+% para_range = {'eta1', 7.7001 , 'eta2', 7.7001, 'alpha', [0.2 ,1.4], 'beta', 0.1700, 'interval', 0.01 };
+% 
+% I    = {'R', R, 'method', 'LEDsvd', 'dim',2, 'model_optimisation', option,'parameter_range',para_range };
+% 
+% 
+% obj_fun_eval = CoEmbedding(I);
+% obj_fun_eval = Eval(obj_fun_eval);
+
+
+
+
+
+##### SOURCE END #####
+--></body></html>
+<a name="CoEmbedding"></a>
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>CoEmbedding</title><meta name="generator" content="MATLAB 8.4"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2015-02-03"><meta name="DC.source" content="CoEmbedding.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#5">Default setting</a></li><li><a href="#6">Assign values to objects</a></li><li><a href="#7">Result initialisation</a></li><li><a href="#8">Create co-embedding objects</a></li></ul></div><pre class="codeinput"><span class="keyword">function</span> obj = CoEmbedding(I)
+</pre><p>COEMBEDDING - Specifying the class of co-embeddings object</p><pre>Obj = CoEmbedding(Setting)</pre><pre>         Setting -   user provided cell array</pre><pre>Return:
+         Obj     -   co-embeddings object</pre><p>Example:</p><pre class="language-matlab">o = CoEmbedding(I);
+I = {<span class="string">'R'</span>, R,<span class="keyword">...</span>
+    <span class="string">'method'</span>, <span class="string">'LEDF'</span>,<span class="keyword">...</span>
+    <span class="string">'dim'</span>,2,<span class="keyword">...</span>
+    <span class="string">'option'</span>,option<span class="keyword">...</span>
+    };
+</pre><pre>Author   : Yu Wu
+          University of Liverpool
+          Electrical Engineering and Electronics
+          Brownlow Hill, Liverpool L69 3GJ
+          yuwu@liv.ac.uk
+Last Rev : Friday, January 17, 2014 (GMT) 10:03 AM
+Tested   : Matlab_R2014b</pre><p>Copyright notice: You are free to modify, extend and distribute       this code granted that the author of the original code is       mentioned as the original author of the code.</p><pre class="codeinput"><span class="comment">% -------------------------------------------------------------------------</span>
+<span class="keyword">if</span> ~exist(<span class="string">'I'</span>,<span class="string">'var'</span>)
+    error(<span class="string">'Wrong input data given to the constructor'</span>);
+<span class="keyword">end</span>
+</pre><h2>Default setting<a name="5"></a></h2><pre class="codeinput">obj.method = <span class="string">'LEDF'</span>;
+obj.dim = 2;
+obj.para_range = [];
+obj.optimisation_score = {<span class="string">'optimisation'</span>, <span class="string">'ga'</span>, <span class="string">'obj_option'</span>, <span class="string">'quant_knn'</span>,<span class="keyword">...</span>
+    <span class="string">'obj_para'</span>, {<span class="string">'knn'</span>, 20}<span class="keyword">...</span>
+    };
+obj.cputime=1;
+</pre><h2>Assign values to objects<a name="6"></a></h2><pre class="codeinput"><span class="keyword">if</span> ~nargin
+    error(<span class="string">'No input values available for the default constructor'</span>);
+<span class="keyword">elseif</span> isa(I,<span class="string">'CoEmbedding'</span>)        <span class="comment">% input is an co-embedding objects</span>
+    obj = I;
+<span class="keyword">else</span>
+    <span class="keyword">for</span> ii = 1 : 2 : length(I)-1
+        <span class="keyword">switch</span> lower(I{ii})
+            <span class="keyword">case</span> {<span class="string">'r'</span>, <span class="string">'input'</span>}
+                obj.R = I{ii+1};
+            <span class="keyword">case</span> <span class="string">'method'</span>
+                obj.method = I{ii+1};
+            <span class="keyword">case</span> {<span class="string">'model_optimisation'</span>, <span class="string">'model_optimization'</span>}
+                obj.optimisation_score = I{ii+1};
+            <span class="keyword">case</span> {<span class="string">'para_range'</span>, <span class="string">'parameter_range'</span>}
+                obj.para_range = I{ii+1};
+            <span class="keyword">case</span> {<span class="string">'k'</span>, <span class="string">'dim'</span>}
+                obj.dim = I{ii+1};
+            <span class="keyword">otherwise</span>
+                error( [<span class="string">'unknown input argument: '</span> I{ii}] );
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre><h2>Result initialisation<a name="7"></a></h2><pre class="codeinput">obj.X = [];
+obj.Y = [];
+obj.best = [];
+obj.model = [];
+obj.exitflag = -10;
+obj.svds = [];
+</pre><h2>Create co-embedding objects<a name="8"></a></h2><pre class="codeinput">obj = class(obj, <span class="string">'CoEmbedding'</span>);
+</pre><pre class="codeinput"><span class="keyword">end</span>
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2014b</a><br></p></div><!--
+\n
+--></body></html>
+<a name="CalRelationXY"></a>
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>CalRelationXY</title><meta name="generator" content="MATLAB 8.4"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2015-02-03"><meta name="DC.source" content="CalRelationXY.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><pre class="codeinput"><span class="keyword">function</span> R = CalRelationXY(X, Y, varargin);
+
+<span class="comment">% Computation of (dis)simialtiy features</span>
+<span class="comment">% T. Mu, Feb. 2011</span>
+
+<span class="keyword">if</span> length(varargin) ==0
+    <span class="comment">%default values</span>
+    type   = <span class="string">'cosine'</span>;
+    para   = [];
+  <span class="keyword">elseif</span> length(varargin) == 1
+    type = varargin{1};
+    para = [];
+  <span class="keyword">elseif</span> length(varargin) == 2
+    type = varargin{1};
+    para = varargin{2};
+  <span class="keyword">end</span>
+
+
+  <span class="keyword">switch</span> lower(type)
+    <span class="keyword">case</span> <span class="string">'dot'</span>
+      R = X*Y';
+    <span class="keyword">case</span> <span class="string">'cosine'</span>
+      R =X*Y';
+      ind = find(R==0);
+      D1 = 1./sqrt(diag(X*X'));
+      D2 = 1./sqrt(diag(Y*Y'));
+      R = bsxfun(@times, R, D1);
+      R = bsxfun(@times, R, D2');
+      R(ind) = 0;
+    <span class="keyword">case</span> {<span class="string">'euclidean'</span>,<span class="string">'sqeuclidean'</span>}
+      DOT=X*Y';
+      T1=sparse(diag(diag(X*X')));
+      T2=sparse(diag(diag(Y*Y')));
+      R = real(sqrt(T1*ones(size(DOT))+ones(size(DOT))*T2-2*DOT));
+    <span class="keyword">case</span> {<span class="string">'sqeuclidean'</span>}
+      DOT=X*Y';
+      T1=sparse(diag(diag(X*X')));
+      T2=sparse(diag(diag(Y*Y')));
+      R = T1*ones(size(DOT))+ones(size(DOT))*T2-2*DOT;
+    <span class="keyword">case</span> <span class="string">'euclidean_sim'</span>
+      DOT=X*Y';
+      T1=sparse(diag(diag(X*X')));
+      T2=sparse(diag(diag(Y*Y')));
+      D = real(sqrt(T1*ones(size(DOT))+ones(size(DOT))*T2-2*DOT));
+      R= max(max(D))-D;
+    <span class="keyword">case</span> <span class="string">'tanimoto'</span> <span class="comment">% Tanimoto similarity coefficient</span>
+      R  = X * Y';
+      D1 = diag(X*X');
+      D2 = diag(Y*Y');
+      R1 = bsxfun(@plus, -R, D1);
+      R1 = bsxfun(@plus, R1, D2');
+      R  = R./R1;
+    <span class="keyword">case</span> <span class="string">'gaussian'</span>
+      DOT=X*Y';
+      T1=sparse(diag(diag(X*X')));
+      T2=sparse(diag(diag(Y*Y')));
+      D = T1*ones(size(DOT))+ones(size(DOT))*T2-2*DOT;
+      <span class="keyword">if</span> isempty(para),                p = median( D(:) ) * 0.5; R = exp(-D/ (2*p^2));
+      <span class="keyword">elseif</span> isequal(para, <span class="string">'max'</span>),     R = exp(-D/ max(D(:)) );
+      <span class="keyword">elseif</span> isequal(para, <span class="string">'mean'</span>),    R = exp(-D/ mean(D(:)) );
+      <span class="keyword">else</span>,                            R = exp(-D/(2*para^2));
+      <span class="keyword">end</span>
+    <span class="keyword">case</span> <span class="string">'gaussian2'</span>
+      DOT=X*Y';
+      T1=sparse(diag(diag(X*X')));
+      T2=sparse(diag(diag(Y*Y')));
+      D = T1*ones(size(DOT))+ones(size(DOT))*T2-2*DOT;
+      R  = exp(-para*D);
+    <span class="keyword">case</span> <span class="string">'poly'</span>
+      DOT = X*Y';
+      <span class="keyword">if</span> isempty(para),              R = (1+DOT).^2;
+      <span class="keyword">elseif</span> length(para)==1,        R = (1+DOT).^para;
+      <span class="keyword">elseif</span> length(para)==2,        R = (para(1)+DOT).^para(2);
+      <span class="keyword">end</span>
+    <span class="keyword">case</span> <span class="string">'lsg'</span> <span class="comment">%local scaling gaussian</span>
+      DOT=X*Y';
+      T1=sparse(diag(diag(X*X')));
+      T2=sparse(diag(diag(Y*Y')));
+      D = T1*ones(size(DOT))+ones(size(DOT))*T2-2*DOT;    <span class="comment">% Square of Euclidean distance</span>
+      [W1,W2]    = NeighborFinder(D, para);
+      Dknn1  = 1./sqrt(max(D.* W1)); Dknn2  = 1./sqrt(max(D.* W2,[],2));
+      R = bsxfun(@times, D, Dknn1);
+      R = bsxfun(@times, R, Dknn2);
+      R = exp(-R);
+
+    <span class="keyword">case</span> <span class="string">'alw'</span> <span class="comment">% alternative weights</span>
+      DOT=X*Y';
+      D1 = diag(X*X');
+      D2 = diag(Y*Y');
+      T1 = sparse(diag(D1));
+      T2 = sparse(diag(D2));
+      D  = T1*ones(size(DOT))+ones(size(DOT))*T2-2*DOT;
+      R  = bsxfun(@plus, zeros(size(D)), D1);
+      R  = bsxfun(@plus, R, D2');
+      R = 1./(D./R + para);
+
+
+    <span class="keyword">case</span> <span class="string">'correlation'</span>
+      d = size(X,2);
+      R =X*(sparse(eye(d)) - 1/d)*Y';
+      D1 = 1./sqrt(diag(X*(sparse(eye(d)) - 1/d)*X'));
+      D2 = 1./sqrt(diag(Y*(sparse(eye(d)) - 1/d)*Y'));
+      R = bsxfun(@times, R, D1);
+      R = bsxfun(@times, R, D2');
+  <span class="keyword">end</span>
+
+<span class="keyword">end</span>
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2014b</a><br></p></div><!--
+\n
+--></body></html>
+<a name="Plotcluster"></a>
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Plotcluster</title><meta name="generator" content="MATLAB 8.4"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2015-02-03"><meta name="DC.source" content="Plotcluster.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><pre class="codeinput"><span class="keyword">function</span> [X1,Y1 ] = Plotcluster( X, lx, Y, ly)
+<span class="comment">% X - DxM Matrix - row embedding data cluster</span>
+<span class="comment">% Y - DxN Matrix - column embedding data cluster</span>
+<span class="comment">% lx - Mx1 Matrix - label information in X datasets</span>
+<span class="comment">% ly - Nx1 Matrix - label information in Y datasets</span>
+
+<span class="keyword">if</span> (nargin&lt;3)
+    Y=[];
+    ly=[];
+<span class="keyword">end</span>
+
+
+[D,M]=size(X);
+<span class="comment">% standard the X Y</span>
+Z= [X Y];
+    a = min(Z(:));
+    b = max(Z(:));
+    c = b - a;
+    range = 1;
+    w = range/c;
+    d = -w*a;
+    W=Z*w+d;
+    X = W(:,1:M);
+    Y = W(:,M+1:end);
+
+    X1=X';
+    Y1=Y';
+
+
+
+<span class="comment">%~~~~~~~~~~_____+++++++++++++****************############$$$$$$$$$$$$$$$$$$</span>
+
+
+<span class="keyword">if</span> (D&gt;3)
+    error(<span class="string">'The datasets exceeding 3-dimension! May inverse this input matrix'</span>);
+<span class="keyword">end</span>
+
+<span class="keyword">if</span> M~=size(lx,1)
+    error(<span class="string">'The X label information is not matched'</span>);
+<span class="keyword">end</span>
+
+[~,I]=sort(lx);          <span class="comment">% ascending order</span>
+lx=lx(I,1);
+X=X(:,I);                <span class="comment">% ordered X data points according to the x label information</span>
+
+<span class="comment">%~~~~~~~~~~~~~~~obtaining all the classes~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~</span>
+cx=unique(lx);          <span class="comment">% get the class label of X datasets sorted in acsending order</span>
+c1=size(cx,1);
+
+
+<span class="keyword">if</span> nargin&gt;2
+    [~,N]=size(Y);
+
+    <span class="keyword">if</span> D~=size(Y,1)
+     error(<span class="string">'The row and column data dimension is not match'</span>);
+    <span class="keyword">end</span>
+
+    <span class="keyword">if</span> N~=size(ly,1)
+      error(<span class="string">'The Y label information is not matched'</span>);
+    <span class="keyword">end</span>
+<span class="comment">%**************************************************************************</span>
+
+
+    [~, I]=sort(ly);         <span class="comment">% ascending order</span>
+    ly=ly(I,1);
+    Y=Y(:,I);                <span class="comment">% ordered Y data points according to the y label information</span>
+
+    cy=unique(ly);          <span class="comment">% get the class label of Y datasets sorted in acsending order</span>
+    c2=size(cy,1);
+<span class="keyword">else</span>
+    c2=0;
+<span class="keyword">end</span>
+
+<span class="comment">%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~</span>
+
+colour=distinguishable_colors(c1+c2,<span class="string">'w'</span>); <span class="comment">% get the c1+c2 distinguishable colours</span>
+
+cxx=zeros(c1,1);
+cyy=zeros(c2,1);
+
+<span class="keyword">for</span> ii=1:c1
+    cxx(ii)=size(find(lx==cx(ii)),1);   <span class="comment">% get the num of each class stored in cx vector</span>
+<span class="keyword">end</span>
+
+<span class="keyword">for</span> jj=1:c2
+    cyy(jj)=size(find(ly==cy(jj)),1);    <span class="comment">% get the num of each class stored in cy vector</span>
+<span class="keyword">end</span>
+
+<span class="comment">%**************************************************************************</span>
+
+  <span class="comment">%  figure()</span>
+    hold <span class="string">on</span>
+
+     <span class="keyword">if</span> D&lt;3                      <span class="comment">% 2D plot</span>
+
+        <span class="keyword">for</span> ii=1:c1
+
+                plot(X(1,1:cxx(ii)),X(2,1:cxx(ii)),<span class="string">'+'</span>, <span class="string">'MarkerEdgeColor'</span>,colour(ii,:),<span class="string">'MarkerSize'</span>,4);
+                X(:,1:cxx(ii))=[];
+
+        <span class="keyword">end</span>
+
+        <span class="keyword">for</span> jj=1:c2
+                plot(Y(1,1:cyy(jj)),Y(2,1:cyy(jj)),<span class="string">'o'</span>, <span class="string">'MarkerEdgeColor'</span>,colour(jj+c1,:),<span class="string">'MarkerSize'</span>,4);
+                Y(:,1:cyy(jj))=[];
+
+        <span class="keyword">end</span>
+
+     <span class="keyword">else</span>
+
+          <span class="keyword">for</span> ii=1:c1
+
+                plot3(X(1,1:cxx(ii)),X(2,1:cxx(ii)),X(3,1:cxx(ii)),<span class="string">'o'</span>, <span class="string">'MarkerEdgeColor'</span>,colour(ii,:),<span class="string">'MarkerSize'</span>,6);
+                X(:,1:cxx(ii))=[];
+
+          <span class="keyword">end</span>
+
+        <span class="keyword">for</span> jj=1:c2
+                plot3(Y(1,1:cyy(jj)),Y(2,1:cyy(jj)),Y(3,1:cyy(jj)),<span class="string">'^'</span>, <span class="string">'MarkerEdgeColor'</span>,colour(jj+c1,:),<span class="string">'MarkerSize'</span>,6);
+                Y(:,1:cyy(jj))=[];
+
+        <span class="keyword">end</span>
+
+     <span class="keyword">end</span>
+
+
+
+hold <span class="string">off</span>
+
+<span class="comment">% figure</span>
+<span class="comment">%   image(reshape(colour,[1 size(colour)]));</span>
+
+<span class="keyword">end</span>
+
+
+<span class="keyword">function</span> colors = distinguishable_colors(n_colors,bg,func)
+<span class="comment">% DISTINGUISHABLE_COLORS: pick colors that are maximally perceptually distinct</span>
+<span class="comment">%</span>
+<span class="comment">% When plotting a set of lines, you may want to distinguish them by color.</span>
+<span class="comment">% By default, Matlab chooses a small set of colors and cycles among them,</span>
+<span class="comment">% and so if you have more than a few lines there will be confusion about</span>
+<span class="comment">% which line is which. To fix this problem, one would want to be able to</span>
+<span class="comment">% pick a much larger set of distinct colors, where the number of colors</span>
+<span class="comment">% equals or exceeds the number of lines you want to plot. Because our</span>
+<span class="comment">% ability to distinguish among colors has limits, one should choose these</span>
+<span class="comment">% colors to be "maximally perceptually distinguishable."</span>
+<span class="comment">%</span>
+<span class="comment">% This function generates a set of colors which are distinguishable</span>
+<span class="comment">% by reference to the "Lab" color space, which more closely matches</span>
+<span class="comment">% human color perception than RGB. Given an initial large list of possible</span>
+<span class="comment">% colors, it iteratively chooses the entry in the list that is farthest (in</span>
+<span class="comment">% Lab space) from all previously-chosen entries. While this "greedy"</span>
+<span class="comment">% algorithm does not yield a global maximum, it is simple and efficient.</span>
+<span class="comment">% Moreover, the sequence of colors is consistent no matter how many you</span>
+<span class="comment">% request, which facilitates the users' ability to learn the color order</span>
+<span class="comment">% and avoids major changes in the appearance of plots when adding or</span>
+<span class="comment">% removing lines.</span>
+<span class="comment">%</span>
+<span class="comment">% Syntax:</span>
+<span class="comment">%   colors = distinguishable_colors(n_colors)</span>
+<span class="comment">% Specify the number of colors you want as a scalar, n_colors. This will</span>
+<span class="comment">% generate an n_colors-by-3 matrix, each row representing an RGB</span>
+<span class="comment">% color triple. If you don't precisely know how many you will need in</span>
+<span class="comment">% advance, there is no harm (other than execution time) in specifying</span>
+<span class="comment">% slightly more than you think you will need.</span>
+<span class="comment">%</span>
+<span class="comment">%   colors = distinguishable_colors(n_colors,bg)</span>
+<span class="comment">% This syntax allows you to specify the background color, to make sure that</span>
+<span class="comment">% your colors are also distinguishable from the background. Default value</span>
+<span class="comment">% is white. bg may be specified as an RGB triple or as one of the standard</span>
+<span class="comment">% "ColorSpec" strings. You can even specify multiple colors:</span>
+<span class="comment">%     bg = {'w','k'}</span>
+<span class="comment">% or</span>
+<span class="comment">%     bg = [1 1 1; 0 0 0]</span>
+<span class="comment">% will only produce colors that are distinguishable from both white and</span>
+<span class="comment">% black.</span>
+<span class="comment">%</span>
+<span class="comment">%   colors = distinguishable_colors(n_colors,bg,rgb2labfunc)</span>
+<span class="comment">% By default, distinguishable_colors uses the image processing toolbox's</span>
+<span class="comment">% color conversion functions makecform and applycform. Alternatively, you</span>
+<span class="comment">% can supply your own color conversion function.</span>
+<span class="comment">%</span>
+<span class="comment">% Example:</span>
+<span class="comment">%   c = distinguishable_colors(25);</span>
+<span class="comment">%   figure</span>
+<span class="comment">%   image(reshape(c,[1 size(c)]))</span>
+<span class="comment">%</span>
+<span class="comment">% Example using the file exchange's 'colorspace':</span>
+<span class="comment">%   func = @(x) colorspace('RGB-&gt;Lab',x);</span>
+<span class="comment">%   c = distinguishable_colors(25,'w',func);</span>
+
+<span class="comment">% Copyright 2010-2011 by Timothy E. Holy</span>
+
+  <span class="comment">% Parse the inputs</span>
+  <span class="keyword">if</span> (nargin &lt; 2)
+    bg = [1 1 1];  <span class="comment">% default white background</span>
+  <span class="keyword">else</span>
+    <span class="keyword">if</span> iscell(bg)
+      <span class="comment">% User specified a list of colors as a cell aray</span>
+      bgc = bg;
+      <span class="keyword">for</span> i = 1:length(bgc)
+	bgc{i} = parsecolor(bgc{i});
+      <span class="keyword">end</span>
+      bg = cat(1,bgc{:});
+    <span class="keyword">else</span>
+      <span class="comment">% User specified a numeric array of colors (n-by-3)</span>
+      bg = parsecolor(bg);
+    <span class="keyword">end</span>
+  <span class="keyword">end</span>
+
+  <span class="comment">% Generate a sizable number of RGB triples. This represents our space of</span>
+  <span class="comment">% possible choices. By starting in RGB space, we ensure that all of the</span>
+  <span class="comment">% colors can be generated by the monitor.</span>
+  n_grid = 30;  <span class="comment">% number of grid divisions along each axis in RGB space</span>
+  x = linspace(0,1,n_grid);
+  [R,G,B] = ndgrid(x,x,x);
+  rgb = [R(:) G(:) B(:)];
+  <span class="keyword">if</span> (n_colors &gt; size(rgb,1)/3)
+    error(<span class="string">'You can''t readily distinguish that many colors'</span>);
+  <span class="keyword">end</span>
+
+  <span class="comment">% Convert to Lab color space, which more closely represents human</span>
+  <span class="comment">% perception</span>
+  <span class="keyword">if</span> (nargin &gt; 2)
+    lab = func(rgb);
+    bglab = func(bg);
+  <span class="keyword">else</span>
+    C = makecform(<span class="string">'srgb2lab'</span>);
+    lab = applycform(rgb,C);
+    bglab = applycform(bg,C);
+  <span class="keyword">end</span>
+
+  <span class="comment">% If the user specified multiple background colors, compute distances</span>
+  <span class="comment">% from the candidate colors to the background colors</span>
+  mindist2 = inf(size(rgb,1),1);
+  <span class="keyword">for</span> i = 1:size(bglab,1)-1
+    dX = bsxfun(@minus,lab,bglab(i,:)); <span class="comment">% displacement all colors from bg</span>
+    dist2 = sum(dX.^2,2);  <span class="comment">% square distance</span>
+    mindist2 = min(dist2,mindist2);  <span class="comment">% dist2 to closest previously-chosen color</span>
+  <span class="keyword">end</span>
+
+  <span class="comment">% Iteratively pick the color that maximizes the distance to the nearest</span>
+  <span class="comment">% already-picked color</span>
+  colors = zeros(n_colors,3);
+  lastlab = bglab(end,:);   <span class="comment">% initialize by making the "previous" color equal to background</span>
+  <span class="keyword">for</span> i = 1:n_colors
+    dX = bsxfun(@minus,lab,lastlab); <span class="comment">% displacement of last from all colors on list</span>
+    dist2 = sum(dX.^2,2);  <span class="comment">% square distance</span>
+    mindist2 = min(dist2,mindist2);  <span class="comment">% dist2 to closest previously-chosen color</span>
+    [~,index] = max(mindist2);  <span class="comment">% find the entry farthest from all previously-chosen colors</span>
+    colors(i,:) = rgb(index,:);  <span class="comment">% save for output</span>
+    lastlab = lab(index,:);  <span class="comment">% prepare for next iteration</span>
+  <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="keyword">function</span> c = parsecolor(s)
+  <span class="keyword">if</span> ischar(s)
+    c = colorstr2rgb(s);
+  <span class="keyword">elseif</span> isnumeric(s) &amp;&amp; size(s,2) == 3
+    c = s;
+  <span class="keyword">else</span>
+    error(<span class="string">'MATLAB:InvalidColorSpec'</span>,<span class="string">'Color specification cannot be parsed.'</span>);
+  <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="keyword">function</span> c = colorstr2rgb(c)
+  <span class="comment">% Convert a color string to an RGB value.</span>
+  <span class="comment">% This is cribbed from Matlab's whitebg function.</span>
+  <span class="comment">% Why don't they make this a stand-alone function?</span>
+  rgbspec = [1 0 0;0 1 0;0 0 1;1 1 1;0 1 1;1 0 1;1 1 0;0 0 0];
+  cspec = <span class="string">'rgbwcmyk'</span>;
+  k = find(cspec==c(1));
+  <span class="keyword">if</span> isempty(k)
+    error(<span class="string">'MATLAB:InvalidColorString'</span>,<span class="string">'Unknown color string.'</span>);
+  <span class="keyword">end</span>
+  <span class="keyword">if</span> k~=3 || length(c)==1,
+    c = rgbspec(k,:);
+  <span class="keyword">elseif</span> length(c)&gt;2,
+    <span class="keyword">if</span> strcmpi(c(1:3),<span class="string">'bla'</span>)
+      c = [0 0 0];
+    <span class="keyword">elseif</span> strcmpi(c(1:3),<span class="string">'blu'</span>)
+      c = [0 0 1];
+    <span class="keyword">else</span>
+      error(<span class="string">'MATLAB:UnknownColorString'</span>, <span class="string">'Unknown color string.'</span>);
+    <span class="keyword">end</span>
+  <span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2014b</a><br></p></div><!--
+\n
+--></body></html>

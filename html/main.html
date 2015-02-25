@@ -1,0 +1,286 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>main</title><meta name="generator" content="MATLAB 8.4"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2015-02-03"><meta name="DC.source" content="main.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1></h1><!--introduction--><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">CoEmbedding algorithm running script</a></li><li><a href="#2">LEDF Model Optimization</a></li></ul></div><h2>CoEmbedding algorithm running script<a name="1"></a></h2><pre class="codeinput">clear <span class="string">classes</span>
+clear
+close <span class="string">all</span>
+clc
+
+path=<span class="string">'/Users/yuwu/Documents/MATLAB/my_matlab/Relational_embedding/LED_release/datasets'</span>;
+addpath(path);
+
+<span class="comment">%match={ 'ring','round','co-dot','SD1','SD2','SD3','SD4','SSD1', 'SSD2','SSD3', 'SSD4',...</span>
+<span class="comment">%       'xor','2dnormals','Aggregation','Compound','circles', 'R15','rface','Pathbased',...</span>
+<span class="comment">%       'CoTarget','CoIris','LetterRecognize','Newletter','ecoli','Codigit','digit04'}</span>
+
+load(<span class="string">'SD3'</span>);
+R=CalRelationXY(X,Y,<span class="string">'gaussian'</span>,<span class="string">'mean'</span>);
+</pre><pre class="codeoutput">Warning: Objects of 'onCleanup' class exist.  Cannot clear this class or
+any of its superclasses. 
+</pre><h2>LEDF Model Optimization<a name="2"></a></h2><pre class="codeinput">opt  = {<span class="string">'optimisation'</span>, <span class="string">'ga'</span>, <span class="string">'obj_option'</span>, <span class="string">'quant_knn'</span>, <span class="string">'obj_para'</span>, {<span class="string">'knn'</span>, 10}};
+
+para_range = {<span class="string">'eta1'</span>,[-1.5,11],<span class="string">'eta2'</span>,[-1.5,11],<span class="string">'alpha'</span>,[0,2], <span class="string">'beta'</span>,[-0.4,2] };
+
+I    = {<span class="string">'R'</span>, R, <span class="string">'method'</span>, <span class="string">'LEDFsvd_beta'</span>, <span class="string">'dim'</span>,2, <span class="string">'model_optimisation'</span>, opt,<span class="string">'parameter_range'</span>,para_range };
+
+
+o    = CoEmbedding(I);
+o    = train(o);
+
+h=figure;
+Plotcluster(o.X',lx,o.Y',ly);
+
+<span class="comment">% %% CoEmbedding model evaluation</span>
+<span class="comment">%</span>
+<span class="comment">% option  = {'evaluation', '3D', 'obj_option', 'quant_knn', 'obj_para', {'knn', 20}};</span>
+<span class="comment">%</span>
+<span class="comment">% para_range = {'eta1', 7.7001 , 'eta2', 7.7001, 'alpha', [0.2 ,1.4], 'beta', 0.1700, 'interval', 0.01 };</span>
+<span class="comment">%</span>
+<span class="comment">% I    = {'R', R, 'method', 'LEDsvd', 'dim',2, 'model_optimisation', option,'parameter_range',para_range };</span>
+<span class="comment">%</span>
+<span class="comment">%</span>
+<span class="comment">% obj_fun_eval = CoEmbedding(I);</span>
+<span class="comment">% obj_fun_eval = Eval(obj_fun_eval);</span>
+</pre><pre class="codeoutput">It is current running LEDFsvd_beta.....diff_alpha
+
+                               Best           Mean      Stall
+Generation      f-count        f(x)           f(x)    Generations
+    1           208             545           781.5        0
+    2           312             545           766.6        1
+    3           416             545           732.4        2
+    4           520             545           724.7        3
+    5           624             545           708.6        4
+    6           728             537           692.7        0
+    7           832             482           670.4        0
+    8           936             458           662.7        0
+    9          1040             458           656.6        1
+   10          1144             443           628.3        0
+   11          1248             443           607.9        1
+   12          1352             443           590.5        2
+   13          1456             439           560.3        0
+   14          1560             439           540.5        1
+   15          1664             439           534.3        2
+   16          1768             439           509.9        3
+   17          1872             438           489.5        0
+   18          1976             435           483.8        0
+   19          2080             435           500.1        1
+   20          2184             435             492        2
+   21          2288             434           472.5        0
+   22          2392             433           470.8        0
+   23          2496             433           484.8        1
+   24          2600             430           473.4        0
+   25          2704             394           483.1        0
+   26          2808             387           495.5        0
+   27          2912             377           507.2        0
+   28          3016             377           531.7        1
+   29          3120             376           514.8        0
+   30          3224             376           508.1        1
+
+                               Best           Mean      Stall
+Generation      f-count        f(x)           f(x)    Generations
+   31          3328             374           511.1        0
+   32          3432             374           542.9        1
+   33          3536             374           542.2        2
+   34          3640             374           524.9        3
+   35          3744             374           479.7        4
+   36          3848             374           442.7        5
+   37          3952             374           426.4        6
+   38          4056             372           403.4        0
+   39          4160             372           396.3        1
+   40          4264             372           385.7        2
+   41          4368             369           381.4        0
+   42          4472             369           381.1        1
+   43          4576             366           379.4        0
+   44          4680             366           376.6        1
+   45          4784             365           374.7        0
+   46          4888             362           374.7        0
+   47          4992             357           376.3        0
+   48          5096             357           387.2        1
+   49          5200             354           381.6        0
+   50          5304             354           388.3        1
+   51          5408             354           384.8        2
+   52          5512             352           375.5        0
+   53          5616             352           372.1        1
+   54          5720             352           367.6        2
+   55          5824             351           362.9        0
+   56          5928             351           363.8        1
+   57          6032             351           359.4        2
+   58          6136             351           356.1        3
+   59          6240             350           355.4        0
+   60          6344             350           355.5        1
+
+                               Best           Mean      Stall
+Generation      f-count        f(x)           f(x)    Generations
+   61          6448             350           354.9        2
+   62          6552             350           354.1        3
+   63          6656             349           352.7        0
+   64          6760             349           352.2        1
+   65          6864             349           351.3        2
+   66          6968             349           350.7        3
+   67          7072             349           350.3        4
+   68          7176             349           349.9        5
+   69          7280             349           349.6        6
+   70          7384             349           349.5        7
+   71          7488             349           349.5        8
+   72          7592             349           349.3        9
+   73          7696             349           349.3       10
+   74          7800             349           349.3       11
+   75          7904             349           349.3       12
+   76          8008             349           349.3       13
+   77          8112             349           349.3       14
+   78          8216             349           349.3       15
+   79          8320             349           349.3       16
+   80          8424             349           349.4       17
+   81          8528             349           349.3       18
+   82          8632             349           349.3       19
+   83          8736             349           349.2       20
+   84          8840             349           349.3       21
+   85          8944             349           349.3       22
+   86          9048             349           349.4       23
+   87          9152             349           349.4       24
+   88          9256             349           349.3       25
+   89          9360             349           349.3       26
+   90          9464             349           349.4       27
+
+                               Best           Mean      Stall
+Generation      f-count        f(x)           f(x)    Generations
+   91          9568             349           349.4       28
+   92          9672             349           349.3       29
+   93          9776             349           349.3       30
+   94          9880             349           349.3       31
+   95          9984             349           349.4       32
+   96         10088             349           349.3       33
+   97         10192             349           349.2       34
+   98         10296             349           349.3       35
+   99         10400             349           349.2       36
+  100         10504             349           349.2       37
+  101         10608             349           349.3       38
+  102         10712             349           349.3       39
+  103         10816             349           349.3       40
+  104         10920             349           349.3       41
+  105         11024             349           349.2       42
+  106         11128             349           349.4       43
+  107         11232             349           349.3       44
+  108         11336             349           349.3       45
+  109         11440             349           349.4       46
+  110         11544             349           349.3       47
+  111         11648             349           349.4       48
+  112         11752             349           349.3       49
+  113         11856             349           349.2       50
+Optimization terminated: average change in the fitness value less than options.TolFun.
+</pre><img vspace="5" hspace="5" src="main_01.png" alt=""> <img vspace="5" hspace="5" src="main_02.png" alt=""> <p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2014b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%%% CoEmbedding algorithm running script
+clear classes
+clear
+close all
+clc
+
+path='/Users/yuwu/Documents/MATLAB/my_matlab/Relational_embedding/LED_release/datasets';
+addpath(path);
+
+%match={ 'ring','round','co-dot','SD1','SD2','SD3','SD4','SSD1', 'SSD2','SSD3', 'SSD4',...
+%       'xor','2dnormals','Aggregation','Compound','circles', 'R15','rface','Pathbased',...
+%       'CoTarget','CoIris','LetterRecognize','Newletter','ecoli','Codigit','digit04'}
+
+load('SD3');
+R=CalRelationXY(X,Y,'gaussian','mean');
+
+%% LEDF Model Optimization
+
+opt  = {'optimisation', 'ga', 'obj_option', 'quant_knn', 'obj_para', {'knn', 10}};
+
+para_range = {'eta1',[-1.5,11],'eta2',[-1.5,11],'alpha',[0,2], 'beta',[-0.4,2] };
+
+I    = {'R', R, 'method', 'LEDFsvd_beta', 'dim',2, 'model_optimisation', opt,'parameter_range',para_range };
+
+
+o    = CoEmbedding(I);
+o    = train(o);
+
+h=figure;
+Plotcluster(o.X',lx,o.Y',ly);
+
+% %% CoEmbedding model evaluation
+% 
+% option  = {'evaluation', '3D', 'obj_option', 'quant_knn', 'obj_para', {'knn', 20}};
+% 
+% para_range = {'eta1', 7.7001 , 'eta2', 7.7001, 'alpha', [0.2 ,1.4], 'beta', 0.1700, 'interval', 0.01 };
+% 
+% I    = {'R', R, 'method', 'LEDsvd', 'dim',2, 'model_optimisation', option,'parameter_range',para_range };
+% 
+% 
+% obj_fun_eval = CoEmbedding(I);
+% obj_fun_eval = Eval(obj_fun_eval);
+
+
+
+
+
+##### SOURCE END #####
+--></body></html>
